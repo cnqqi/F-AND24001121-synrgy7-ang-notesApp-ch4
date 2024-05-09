@@ -5,9 +5,9 @@ import com.synrgy.challenge4.model.Note
 
 class NoteRepository (private val db:NoteDatabase) {
 
-    suspend fun insertNote(note: Note) = db.getNotDao()
-    suspend fun deleteNote(note: Note) = db.getNotDao()
-    suspend fun updateNote(note: Note) = db.getNotDao()
+    suspend fun insertNote(note: Note) = db.getNotDao().insertNote(note)
+    suspend fun deleteNote(note: Note) = db.getNotDao().deleteNote(note)
+    suspend fun updateNote(note: Note) = db.getNotDao().updateNote(note)
 
     fun getAllNotes() = db.getNotDao().getAllNotes()
     fun seacrhNote(query: String?) = db.getNotDao().searchNote(query)

@@ -22,20 +22,19 @@ import com.synrgy.challenge4.databinding.FragmentHomeBinding
 import com.synrgy.challenge4.model.Note
 import com.synrgy.challenge4.viewmodel.NoteViewModel
 
-
-class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextListener {
+class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextListener, MenuProvider {
 
     private var homeBinding: FragmentHomeBinding? = null
-    private val binding get() = homeBinding ?: throw IllegalStateException("Fragment not attached")
+    private val binding get() = homeBinding!!
 
     private lateinit var noteViewModel: NoteViewModel
     private lateinit var noteAdapter: NoteAdapter
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View? {
+
         homeBinding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -43,24 +42,22 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        noteViewModel = (requireActivity() as MainActivity).noteViewModel
-        setupHomeRecyclerView()
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
+        noteViewModel = (activity as MainActivity).noteViewModel
+        setupHomeRecycleView()
 
         binding.addNoteFab.setOnClickListener{
             it.findNavController().navigate(R.id.action_homeFragment_to_addNoteFragment)
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        homeBinding = null
-    }
-
     private fun updateUI(note: List<Note>?) {
         if (note != null) {
             if(note.isNotEmpty()){
                 binding.emptyNotesImage.visibility = View.GONE
-                binding.homeRecyclerView.visibility = View.VISIBLE
+                binding.emptyNotesImage.visibility = View.VISIBLE
             } else {
                 binding.emptyNotesImage.visibility = View.VISIBLE
                 binding.homeRecyclerView.visibility = View.GONE
@@ -68,7 +65,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
         }
     }
 
-    private fun setupHomeRecyclerView(){
+    private fun setupHomeRecycleView(){
         noteAdapter = NoteAdapter()
         binding.homeRecyclerView.apply {
             layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
@@ -77,37 +74,50 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
         }
 
         activity?.let {
-            noteViewModel.getAllNotes().observe(viewLifecycleOwner) { note ->
-                noteAdapter.submitList(note)
+            noteViewModel.getAllNotes().observe(viewLifecycleOwner) {note ->
+                noteAdapter.differ.submitList(note)
                 updateUI(note)
+
             }
         }
-
     }
 
     private fun searchNote(query: String?){
         val searchQuery = "%$query"
 
-        noteViewModel.seacrhNote(searchQuery).observe(viewLifecycleOwner) { list ->
-            noteAdapter.submitList(list)
+        noteViewModel.seacrhNote(searchQuery).observe(this) { list ->
+            noteAdapter.differ.submitList(list)
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.home_menu, menu)
-
-        val searchItem = menu.findItem(R.id.searchMenu)
-        val searchView = searchItem?.actionView as SearchView
-        searchView.setOnQueryTextListener(this)
-    }
-
-    override fun onQueryTextSubmit(query: String?): Boolean {
+    override fun onQueryTextSubmit(p0: String?): Boolean {
         return false
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        newText?.let { searchNote(it) }
+        if (newText != null){
+            searchNote(newText)
+        }
         return true
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        homeBinding = null
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menu.clear()
+        menuInflater.inflate(R.menu.home_menu, menu)
+
+        val menuSearch = menu.findItem(R.id.searchMenu).actionView as SearchView
+        menuSearch.isSubmitButtonEnabled = false
+        menuSearch.setOnQueryTextListener(this)
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return false
+    }
+
+
 }

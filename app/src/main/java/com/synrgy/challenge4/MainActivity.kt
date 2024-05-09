@@ -7,6 +7,7 @@ import com.synrgy.challenge4.database.NoteDatabase
 import com.synrgy.challenge4.repository.NoteRepository
 import com.synrgy.challenge4.viewmodel.NoteViewModel
 import com.synrgy.challenge4.viewmodel.NoteViewModelFactory
+
 class MainActivity : AppCompatActivity() {
 
     lateinit var noteViewModel: NoteViewModel
@@ -18,10 +19,11 @@ class MainActivity : AppCompatActivity() {
         setupViewModel()
     }
 
-    private fun setupViewModel() {
+    private fun setupViewModel(){
         val noteRepository = NoteRepository(NoteDatabase(this))
         val viewModelProviderFactory = NoteViewModelFactory(application, noteRepository)
-        noteViewModel = ViewModelProvider(this, viewModelProviderFactory).get(NoteViewModel::class.java)
+        noteViewModel = ViewModelProvider(this, viewModelProviderFactory)[NoteViewModel::class.java]
     }
 }
+
 
