@@ -21,7 +21,7 @@ import com.synrgy.challenge4.databinding.FragmentEditNoteBinding
 import com.synrgy.challenge4.model.Note
 import com.synrgy.challenge4.viewmodel.NoteViewModel
 
-class EditNoteFragment : Fragment(R.layout.fragment_edit_note) {
+class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
 
     private var editNoteBinding: FragmentEditNoteBinding? = null
     private val binding get() = editNoteBinding!!
@@ -68,23 +68,8 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note) {
         editNoteBinding = null
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_edit_note, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.deleteMenu -> {
-                deleteNote()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
     private fun deleteNote() {
-        AlertDialog.Builder(requireContext()).apply {
+        AlertDialog.Builder(activity).apply {
             setTitle("Delete Note")
             setMessage("Do you want to delete this note?")
             setPositiveButton("Delete") { _, _ ->
@@ -94,5 +79,19 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note) {
             }
             setNegativeButton("Cancel", null)
         }.create().show()
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menu.clear()
+        menuInflater.inflate(R.menu.menu_edit_note, menu)
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return when (menuItem.itemId){
+            R.id.deleteMenu -> {
+                deleteNote()
+                true
+            }else -> false
+        }
     }
 }

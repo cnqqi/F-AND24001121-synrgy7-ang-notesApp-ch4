@@ -10,5 +10,5 @@ class NoteRepository (private val db:NoteDatabase) {
     suspend fun updateNote(note: Note) = db.getNotDao().updateNote(note)
 
     fun getAllNotes() = db.getNotDao().getAllNotes()
-    fun seacrhNote(query: String?) = db.getNotDao().searchNote(query)
+    fun searchNote(query: String?) = db.getNotDao().searchNote(query)
 }

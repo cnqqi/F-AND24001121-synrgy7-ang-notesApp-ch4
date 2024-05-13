@@ -26,6 +26,6 @@ class NoteViewModel (app: Application, private val noteRepository: NoteRepositor
 
     fun getAllNotes() = noteRepository.getAllNotes()
 
-    fun seacrhNote(query: String?) =
-        noteRepository.seacrhNote(query)
+    fun searchNote(query: String?) =
+        noteRepository.searchNote(query)
 }

@@ -50,7 +50,7 @@ class NoteAdapter : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
         }
     }
 
-//    fun submitList(newList: List<Note>) {
-//        differ.submitList(newList)
-//    }
+    fun submitList(newList: List<Note>) {
+        differ.submitList(newList)
+    }
 }
