@@ -49,11 +49,11 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
         binding.editNoteTitle.setText(currentNote.noteTittle)
         binding.editNoteDesc.setText(currentNote.noteDesc)
 
-        binding.editNoteFab.setOnClickListener{
+        binding.editNoteFab.setOnClickListener {
             val noteTitle = binding.editNoteTitle.text.toString().trim()
             val noteDesc = binding.editNoteDesc.text.toString().trim()
 
-            if (noteTitle.isNotEmpty()){
+            if (noteTitle.isNotEmpty()) {
                 val note = Note(currentNote.id, noteTitle, noteDesc)
                 notesViewModel.updateNote(note)
                 view.findNavController().popBackStack(R.id.homeFragment, false)
@@ -61,6 +61,8 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
                 Toast.makeText(context, "Please enter title", Toast.LENGTH_SHORT).show()
             }
         }
+
+        requireActivity().addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     override fun onDestroyView() {
@@ -87,11 +89,13 @@ class EditNoteFragment : Fragment(R.layout.fragment_edit_note), MenuProvider {
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-        return when (menuItem.itemId){
+        return when (menuItem.itemId) {
             R.id.deleteMenu -> {
                 deleteNote()
                 true
-            }else -> false
+            }
+            else -> false
         }
     }
 }
+

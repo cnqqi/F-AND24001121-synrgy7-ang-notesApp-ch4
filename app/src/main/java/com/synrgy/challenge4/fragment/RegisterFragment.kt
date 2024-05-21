@@ -1,42 +1,63 @@
 package com.synrgy.challenge4.fragment
 
 import android.os.Bundle
-import android.view.KeyEvent
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.synrgy.challenge4.R
+import com.synrgy.challenge4.database.AppDatabase
+import com.synrgy.challenge4.database.UserDao
+import com.synrgy.challenge4.repository.UserRepository
+import com.synrgy.challenge4.viewmodel.AuthViewModel
+import com.synrgy.challenge4.viewmodel.AuthViewModelFactory
+import kotlinx.coroutines.launch
 
+class RegisterFragment : Fragment() {
 
-class RegisterFragment : Fragment(), View.OnClickListener, View.OnFocusChangeListener, View.OnKeyListener {
+    private lateinit var viewModel: AuthViewModel
 
-//    private var _binding: FragmentRegisterBinding? = null
-//    private val binding get() = _binding!!
-//
-//    override fun onCreateView(
-//        inflater: LayoutInflater, container: ViewGroup?,
-//        savedInstanceState: Bundle?
-//    ): View? {
-//        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
-//        return binding.root
-//    }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_register, container, false)
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-//        _binding = null
-    }
+        // Initialize database and repository
+        val database = AppDatabase.getInstance(requireContext())
+        val userDao = database.userDao()
+        val userRepository = UserRepository(userDao)
+        val factory = AuthViewModelFactory(userRepository)
+        viewModel = ViewModelProvider(this, factory).get(AuthViewModel::class.java)
 
-    override fun onClick(view: View?) {
-        // Implement your click handling logic here
-    }
+        view.findViewById<Button>(R.id.btn_register).setOnClickListener {
+            val email = view.findViewById<EditText>(R.id.et_email).text.toString()
+            val username = view.findViewById<EditText>(R.id.et_name).text.toString()
+            val password = view.findViewById<EditText>(R.id.et_password).text.toString()
 
-    override fun onFocusChange(view: View?, hasFocus: Boolean) {
-        // Implement your focus change handling logic here
-    }
+            if (email.isEmpty() || username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-    override fun onKey(view: View?, keyCode: Int, event: KeyEvent?): Boolean {
-        // Implement your key handling logic here
-        return false
+            lifecycleScope.launch {
+                try {
+                    viewModel.register(email, username, password)
+                    findNavController().navigate(R.id.action_registerFragment_to_homeFragment)
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Registration failed. Please try again.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        return view
     }
 }

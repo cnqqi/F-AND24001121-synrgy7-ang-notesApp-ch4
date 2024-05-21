@@ -49,7 +49,7 @@ class HomeFragment : Fragment(R.layout.fragment_home), SearchView.OnQueryTextLis
             it.findNavController().navigate(R.id.action_homeFragment_to_addNoteFragment)
         }
 
-        noteViewModel.getAllNotes().observe(viewLifecycleOwner) { notes ->
+        val observe = noteViewModel.getAllNotes().observe(viewLifecycleOwner) { notes ->
             noteAdapter.submitList(notes)
             updateUI(notes)
         }

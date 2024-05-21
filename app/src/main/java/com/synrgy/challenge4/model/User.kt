@@ -1,12 +1,13 @@
-package com.synrgy.challenge4.database
+package com.synrgy.challenge4.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "user")
+@Entity(tableName = "users")
 data class User(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
+    val id: Int = 0,
     val email: String,
+    val username: String,
     val password: String
 )

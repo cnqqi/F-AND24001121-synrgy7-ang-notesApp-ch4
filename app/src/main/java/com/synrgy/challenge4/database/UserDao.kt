@@ -2,15 +2,14 @@ package com.synrgy.challenge4.database
 
 import androidx.room.Dao
 import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.synrgy.challenge4.model.User
 
 @Dao
 interface UserDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(user: User)
+    @Query("SELECT * FROM users WHERE username = :username AND password = :password")
+    suspend fun getUser(username: String, password: String): User?
 
-    @Query("SELECT * FROM user WHERE email = :email AND password = :password")
-    suspend fun getUser(email: String, password: String): User
-
+    @Insert
+    suspend fun insertUser(user: User)
 }
